@@ -81,21 +81,25 @@ jobs:
           set -x
           assets=()
           for asset in ./*.zip; do
-            assets+=("-a" "$asset")
+            if [ -f "$asset" ]; then
+              assets+=("$asset")
+            fi
           done
 
           # Always create draft releases by default
           # Can be overridden to published by setting create_draft to false in manual runs
-          draft_flag="-d"
-          if [ "${{ github.event.inputs.create_draft }}" = "false" ]; then
-            draft_flag=""
+          draft_flag=()
+          if [ "${{ github.event.inputs.create_draft }}" != "false" ]; then
+            draft_flag=("--draft")
           fi
+
+          tag="v${{ steps.set-version.outputs.version }}"
 
           # Use generated release notes if available, otherwise use simple message
           if [ -f "release_notes.md" ]; then
-            gh release create "${assets[@]}" $draft_flag -F "release_notes.md" "v${{ steps.set-version.outputs.version }}"
+            gh release create "$tag" "${assets[@]}" "${draft_flag[@]}" --title "$tag" --notes-file "release_notes.md"
           else
-            gh release create "${assets[@]}" $draft_flag -m "Release v${{ steps.set-version.outputs.version }}" "v${{ steps.set-version.outputs.version }}"
+            gh release create "$tag" "${assets[@]}" "${draft_flag[@]}" --title "$tag" --notes "Release $tag"
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
