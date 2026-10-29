@@ -1,9 +1,9 @@
 {
   "atmosphere": {
-    "version": "1.12.0",
-    "published_at": "2026-09-27T23:21:53+00:00",
+    "version": "1.12.1",
+    "published_at": "2026-10-16T00:05:51+00:00",
     "repo": "Atmosphere-NX/Atmosphere",
-    "url": "https://github.com/Atmosphere-NX/Atmosphere/releases/tag/1.12.0"
+    "url": "https://github.com/Atmosphere-NX/Atmosphere/releases/tag/1.12.1"
   },
   "hekate": {
     "version": "v6.5.4",
@@ -66,10 +66,10 @@
     "url": "https://github.com/XorTroll/Goldleaf/releases/tag/1.2.1"
   },
   "syspatch": {
-    "version": "v1.6.2.3",
-    "published_at": "2026-06-17T08:03:39+00:00",
+    "version": "v1.6.3.0",
+    "published_at": "2026-10-19T05:33:41+00:00",
     "repo": "impeeza/sys-patch",
-    "url": "https://github.com/impeeza/sys-patch/releases/tag/v1.6.2.3"
+    "url": "https://github.com/impeeza/sys-patch/releases/tag/v1.6.3.0"
   },
   "sysclk": {
     "version": "2.0.1",
