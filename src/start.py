@@ -5,55 +5,53 @@ logging.basicConfig(format='[%(asctime)s] %(message)s', datefmt='%H:%M:%S')
 logging.getLogger().setLevel(logging.INFO)
 
 if __name__ == '__main__':
-    
-  parser = argparse.ArgumentParser(description="eXploitz's Ascent build script.")
-  requiredNamed = parser.add_argument_group('Options required to build a release candidate')
-  requiredNamed.add_argument('-gt', '--githubToken', help='Github Token', required=True)
-  args = parser.parse_args()
 
-  sdcard = FS()
-  github = GH(args.githubToken)
+    parser = argparse.ArgumentParser(description="eXploitz's Ascent build script.")
+    requiredNamed = parser.add_argument_group('Options required to build a release candidate')
+    requiredNamed.add_argument('-gt', '--githubToken', help='Github Token', required=True)
+    args = parser.parse_args()
 
-  with open('./settings.json', 'r') as f:
-    settings = json.load(f)
+    sdcard = FS()
+    github = GH(args.githubToken)
 
-  with open('./version.json', 'r') as f:
-    version = json.load(f)
-    releaseVersion = version['releaseVersion']
+    with open('./settings.json', 'r') as f:
+        settings = json.load(f)
 
-  neededModules = []
-  for package in settings["packages"]:
-    if package["active"]:
-      for module in package["modules"]:
-        if module not in neededModules:
-          neededModules.append(module)
+    with open('./version.json', 'r') as f:
+        version = json.load(f)
+        releaseVersion = version['releaseVersion']
 
-
-  for i in neededModules:
-    module = settings["moduleList"][i]
-    github.downloadReleaseAssets(module)
+    neededModules = []
+    for package in settings["packages"]:
+        if package["active"]:
+            for module in package["modules"]:
+                if module not in neededModules:
+                    neededModules.append(module)
 
 
-  for package in settings["packages"]:
-    if package["active"]:
-      logging.info(f"[{package['name']}] Creating package")
-      sdcard.createSDEnv()
-
-      for i in package["modules"]:
+    for i in neededModules:
         module = settings["moduleList"][i]
-        logging.info(f"[{package['name']}][{module['repo']}] Creating module env")
-        sdcard.createModuleEnv(module)
-        for step in module["steps"]:
-          logging.info(f"[{package['name']}][{module['repo']}] Executing step: {step['name']}")
-          sdcard.executeStep(module, step)
-        
-        logging.info(f"[{package['name']}][{module['repo']}] Moving MENV to SD")
-        sdcard.finishModule()
-      
-      logging.info(f"[{package['name']}] All modules processed.")
-      logging.info(f"[{package['name']}] Creating ASCENT file in atmosphere folder")
-      sdcard.createAscentFile(releaseVersion, package['name'])
-      logging.info(f"[{package['name']}] Creating ZIP")
-      shutil.make_archive(f"ascent-{package['name']}_v{releaseVersion}", 'zip', "./sd")
+        github.downloadReleaseAssets(module)
 
 
+    for package in settings["packages"]:
+        if package["active"]:
+            logging.info(f"[{package['name']}] Creating package")
+            sdcard.createSDEnv()
+
+            for i in package["modules"]:
+                module = settings["moduleList"][i]
+                logging.info(f"[{package['name']}][{module['repo']}] Creating module env")
+                sdcard.createModuleEnv(module)
+                for step in module["steps"]:
+                    logging.info(f"[{package['name']}][{module['repo']}] Executing step: {step['name']}")
+                    sdcard.executeStep(module, step)
+
+                logging.info(f"[{package['name']}][{module['repo']}] Moving MENV to SD")
+                sdcard.finishModule()
+
+            logging.info(f"[{package['name']}] All modules processed.")
+            logging.info(f"[{package['name']}] Creating ASCENT file in atmosphere folder")
+            sdcard.createAscentFile(releaseVersion, package['name'])
+            logging.info(f"[{package['name']}] Creating ZIP")
+            shutil.make_archive(f"ascent-{package['name']}_v{releaseVersion}", 'zip', "./sd")

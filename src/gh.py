@@ -13,7 +13,7 @@ class GH():
     def downloadReleaseAssets(self, module):
         try:
             ghRepo = self.github.get_repo(module["repo"])
-        except:
+        except Exception:
             logging.exception(f"Unable to get: {module['repo']}")
             return
         

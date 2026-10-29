@@ -23,27 +23,26 @@ class FS():
         shutil.rmtree("./menv", ignore_errors=True)
 
     def executeStep(self, module, step):
-        if step["name"] == "extract":
-            self.__extract(step["arguments"][0])
-        
-        if step["name"] == "create_dir":
-            self.__createDir(step["arguments"][0])
+        name = step["name"]
+        args = step["arguments"]
 
-        if step["name"] == "create_file":
-            self.__createFile(step["arguments"][0], step["arguments"][1])
-
-        if step["name"] == "replace_content":
-            self.__replaceFileContent(step["arguments"][0], step["arguments"][1], step["arguments"][2])
-
-        if step["name"] == "delete":
-            self.__delete(step["arguments"][0])
-
-        if step["name"] == "copy":
-            self.__copy(step["arguments"][0], step["arguments"][1])
-
-        if step["name"] == "move":
-            self.__copy(step["arguments"][0], step["arguments"][1])
-            self.__delete(step["arguments"][0])
+        if name == "extract":
+            self.__extract(args[0])
+        elif name == "create_dir":
+            self.__createDir(args[0])
+        elif name == "create_file":
+            self.__createFile(args[0], args[1])
+        elif name == "replace_content":
+            self.__replaceFileContent(args[0], args[1], args[2])
+        elif name == "delete":
+            self.__delete(args[0])
+        elif name == "copy":
+            self.__copy(args[0], args[1])
+        elif name == "move":
+            self.__copy(args[0], args[1])
+            self.__delete(args[0])
+        else:
+            logging.warning(f"Unknown step: {name}")
         
 
 
@@ -81,13 +80,11 @@ class FS():
             f.write(content)
     
     def __replaceFileContent(self, source, search, replace):
-        fin = open(f"./menv/{source}", "rt")
-        data = fin.read()
+        with open(f"./menv/{source}", "rt") as fin:
+            data = fin.read()
         data = data.replace(search, replace)
-        fin.close()
-        fin = open(f"./menv/{source}", "wt")
-        fin.write(data)
-        fin.close()
+        with open(f"./menv/{source}", "wt") as fout:
+            fout.write(data)
 
     def __copyToSD(self):
         shutil.copytree("./menv", "./sd/", dirs_exist_ok=True)

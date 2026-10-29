@@ -53,6 +53,7 @@
                 "ultrahand",
                 "statusmonitoroverlay",
 		        "missioncontrol",
+                "ldn_mitm",
                 "downgradefixer"
             ]
         }
@@ -122,7 +123,7 @@
                     "arguments": ["bootloader/hekate_*", "bootloader/update.bin"]
                 },
                 {
-                    "name": "createDir",
+                    "name": "create_dir",
                     "arguments": ["atmosphere"]
                 },
                 {
