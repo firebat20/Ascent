@@ -52,7 +52,7 @@
                 "ovlsysmodules",
                 "ultrahand",
                 "statusmonitoroverlay",
-		        "missioncontrol",
+                "missioncontrol",
                 "ldn_mitm",
                 "downgradefixer"
             ]

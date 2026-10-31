@@ -32,10 +32,12 @@ jobs:
       - uses: actions/checkout@v7
 
       - id: set-version
+        env:
+          INPUT_VERSION: ${{ github.event.inputs.release_version }}
         run: |
           # Use manual input version if provided, otherwise use version.json
-          if [ -n "${{ github.event.inputs.release_version }}" ]; then
-            version="${{ github.event.inputs.release_version }}"
+          if [ -n "$INPUT_VERSION" ]; then
+            version="$INPUT_VERSION"
           else
             version=$(python -c 'import sys, json; f=open("./version.json");print(json.loads(f.read())["releaseVersion"])')
           fi
@@ -55,26 +57,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python ./start.py -gt="$GITHUB_TOKEN"
+          python ./start.py
 
       - name: Generate Release Notes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          python ./version_tracker.py -gt="$GITHUB_TOKEN" -o="release_notes.md"
-
-      - name: Commit Version Tracking File
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-
-          if [ -f "last_component_versions.json" ]; then
-            git add last_component_versions.json
-            git diff --staged --quiet || git commit -m "Update component version tracking [skip ci]"
-            git push
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          python ./version_tracker.py -o="release_notes.md"
 
       - name: Create Release
         run: |
@@ -89,7 +78,7 @@ jobs:
           # Always create draft releases by default
           # Can be overridden to published by setting create_draft to false in manual runs
           draft_flag=()
-          if [ "${{ github.event.inputs.create_draft }}" != "false" ]; then
+          if [ "$INPUT_CREATE_DRAFT" != "false" ]; then
             draft_flag=("--draft")
           fi
 
@@ -97,9 +86,33 @@ jobs:
 
           # Use generated release notes if available, otherwise use simple message
           if [ -f "release_notes.md" ]; then
-            gh release create "$tag" "${assets[@]}" "${draft_flag[@]}" --title "$tag" --notes-file "release_notes.md"
+            notes_flag=("--notes-file" "release_notes.md")
           else
-            gh release create "$tag" "${assets[@]}" "${draft_flag[@]}" --title "$tag" --notes "Release $tag"
+            notes_flag=("--notes" "Release $tag")
+          fi
+
+          # Re-running for an existing tag updates the release instead of failing
+          if gh release view "$tag" >/dev/null 2>&1; then
+            if [ ${#assets[@]} -gt 0 ]; then
+              gh release upload "$tag" "${assets[@]}" --clobber
+            fi
+            gh release edit "$tag" "${notes_flag[@]}" --title "$tag"
+          else
+            gh release create "$tag" "${assets[@]}" "${draft_flag[@]}" --title "$tag" "${notes_flag[@]}"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INPUT_CREATE_DRAFT: ${{ github.event.inputs.create_draft }}
+
+      - name: Commit Version Tracking File
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+          if [ -f "last_component_versions.json" ]; then
+            git add last_component_versions.json
+            git diff --staged --quiet || git commit -m "Update component version tracking [skip ci]"
+            git push
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

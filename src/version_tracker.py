@@ -24,11 +24,11 @@ class VersionTracker:
                 repo = self.github.get_repo(module_config["repo"])
                 releases = repo.get_releases()
                 
-                # Find the latest stable release (skip pre-releases)
+                # Find the latest stable release (skip pre-releases and drafts)
                 latest_release = None
                 if releases.totalCount > 0:
                     for release in releases:
-                        if not release.prerelease:
+                        if not release.prerelease and not release.draft:
                             latest_release = release
                             break
                 
@@ -212,10 +212,13 @@ class VersionTracker:
 
 def main():
     parser = argparse.ArgumentParser(description="Generate changelog based on component updates")
-    parser.add_argument('-gt', '--github-token', required=True, help='GitHub Token')
+    parser.add_argument('-gt', '--github-token', default=os.environ.get('GITHUB_TOKEN'), help='GitHub Token (defaults to $GITHUB_TOKEN)')
     parser.add_argument('-o', '--output', default='changelog.md', help='Output file')
-    
+
     args = parser.parse_args()
+
+    if not args.github_token:
+        parser.error("A GitHub token is required. Pass -gt/--github-token or set GITHUB_TOKEN.")
     
     # Load settings
     try:
@@ -258,3 +261,5 @@ def main():
 
 if __name__ == '__main__':
     exit(main())
+
+

@@ -52,8 +52,19 @@ class FS():
             if re.search(source, filename):
                 assetPath = f"./menv/{filename}"
                 with zipfile.ZipFile(assetPath, 'r') as zip_ref:
+                    for member in zip_ref.infolist():
+                        if self.__isUnsafeZipPath(path, member.filename):
+                            raise ValueError(f"Blocked unsafe path in {filename}: {member.filename}")
                     zip_ref.extractall(path)
-                self.__delete(filename)   
+                self.__delete(filename)
+
+    def __isUnsafeZipPath(self, baseDir, member):
+        base = os.path.realpath(baseDir)
+        target = os.path.realpath(os.path.join(base, member))
+        try:
+            return os.path.commonpath([base, target]) != base
+        except ValueError:
+            return True
 
     def __delete(self, source):
         if not os.path.isdir(f"./menv/{source}"):

@@ -2,6 +2,8 @@ src/base/*
 src/tmp/*
 src/sd/*
 src/menv/*
+src/release_notes.md
+src/changelog.md
 src/*.zip
 
 # Byte-compiled / optimized / DLL files

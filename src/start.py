@@ -1,4 +1,4 @@
-import logging, json, argparse, shutil
+import logging, json, argparse, os, shutil
 from gh import GH
 from fs import FS
 logging.basicConfig(format='[%(asctime)s] %(message)s', datefmt='%H:%M:%S')
@@ -8,8 +8,11 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description="eXploitz's Ascent build script.")
     requiredNamed = parser.add_argument_group('Options required to build a release candidate')
-    requiredNamed.add_argument('-gt', '--githubToken', help='Github Token', required=True)
+    requiredNamed.add_argument('-gt', '--githubToken', default=os.environ.get('GITHUB_TOKEN'), help='Github Token (defaults to $GITHUB_TOKEN)')
     args = parser.parse_args()
+
+    if not args.githubToken:
+        parser.error("A GitHub token is required. Pass -gt/--githubToken or set GITHUB_TOKEN.")
 
     sdcard = FS()
     github = GH(args.githubToken)
@@ -31,7 +34,8 @@ if __name__ == '__main__':
 
     for i in neededModules:
         module = settings["moduleList"][i]
-        github.downloadReleaseAssets(module)
+        if not github.downloadReleaseAssets(module):
+            raise SystemExit(f"Failed to download assets for: {module['repo']}")
 
 
     for package in settings["packages"]:

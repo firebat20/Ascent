@@ -48,7 +48,7 @@ Send the Hekate payload to your Switch in RCM mode and launch the CFW
 | [ovlSysmodules](https://github.com/ppkantorski/ovl-sysmodules) | ✅ | ✅ |  |
 | [Status Monitor Overlay](https://github.com/masagrator/Status-Monitor-Overlay) | ✅ |  |  |
 | [sys-patch](https://github.com/impeeza/sys-patch) | ✅ |  |  |
-| [sys-clk](https://github.com/retronx-team/sys-clk) | ✅ |  |
+| [sys-clk](https://github.com/exploitz86/sys-clk) | ✅ |  |  |
 | [sys-con](https://github.com/exploitz86/sys-con) | ✅ |  |  |
 | [DowngradeFixer](https://github.com/sthetix/DowngradeFixer) | ✅ |  |  |
 | [Ultrahand-Overlay](https://github.com/ppkantorski/Ultrahand-Overlay) | ✅ | ✅ |  |
