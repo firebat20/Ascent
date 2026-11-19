@@ -1,38 +1,65 @@
-import pathlib
-import shutil
-import urllib.request
-from github import Github
-import re
 import logging
+import pathlib
+import re
+import shutil
+import urllib.error
+import urllib.request
+from typing import Optional
+from urllib.parse import urlparse
 
-class GH():
-    def __init__(self, ghToken):
-        self.token = ghToken
+from github import Github, GithubException
+from github.GitRelease import GitRelease
+from github.Repository import Repository
+
+
+class _SafeRedirectHandler(urllib.request.HTTPRedirectHandler):
+    """Strip the Authorization header when redirecting to a different host.
+
+    GitHub's asset download API (api.github.com) redirects to a signed S3 URL.
+    Without this handler, urllib forwards the Authorization header to the
+    storage backend, leaking the token to a third-party host.
+    """
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        new_req = super().redirect_request(req, fp, code, msg, headers, newurl)
+        if new_req is not None:
+            original_host = urlparse(req.full_url).netloc
+            new_host = urlparse(new_req.full_url).netloc
+            if original_host != new_host:
+                new_req.remove_header("Authorization")
+        return new_req
+
+
+def find_latest_stable_release(repo: Repository) -> Optional[GitRelease]:
+    """Return the latest non-prerelease, non-draft release, or None."""
+    releases = repo.get_releases()
+    if releases.totalCount == 0:
+        return None
+    for release in releases:
+        if not release.prerelease and not release.draft:
+            return release
+    return None
+
+
+class GH:
+    def __init__(self, gh_token: str):
+        self.token = gh_token
         self.github = Github(self.token)
 
-    def downloadReleaseAssets(self, module):
+    def downloadReleaseAssets(self, module: dict) -> bool:
         try:
             ghRepo = self.github.get_repo(module["repo"])
-        except Exception:
+        except GithubException:
             logging.exception(f"Unable to get: {module['repo']}")
             return False
 
-        releases = ghRepo.get_releases()
-        if releases.totalCount == 0:
-            logging.warning(f"No available release for: {module['repo']}")
-            return False
-
-        # Find the latest stable release (skip pre-releases and drafts)
-        ghLatestRelease = None
-        for release in releases:
-            if not release.prerelease and not release.draft:
-                ghLatestRelease = release
-                logging.info(f"[{module['repo']}] Using stable release: {release.tag_name}")
-                break
+        ghLatestRelease = find_latest_stable_release(ghRepo)
 
         if ghLatestRelease is None:
             logging.warning(f"No stable release found for: {module['repo']}")
             return False
+
+        logging.info(f"[{module['repo']}] Using stable release: {ghLatestRelease.tag_name}")
 
         fpath = f"./base/{module['repo']}/"
         pathlib.Path(fpath).mkdir(parents=True, exist_ok=True)
@@ -43,7 +70,7 @@ class GH():
                 logging.info(f"[{module['repo']}] Downloading: {asset.name}")
                 try:
                     self.__downloadAsset(asset, f"{fpath}{asset.name}")
-                except Exception:
+                except (urllib.error.URLError, OSError):
                     logging.exception(f"[{module['repo']}] Failed to download: {asset.name}")
                     return False
                 downloaded += 1
@@ -54,9 +81,8 @@ class GH():
 
         return True
 
-    def __downloadAsset(self, asset, dest):
-        # Use the API asset URL so private release assets download with auth;
-        # urllib follows the signed redirect to the storage backend.
+    def __downloadAsset(self, asset, dest: str) -> None:
+        opener = urllib.request.build_opener(_SafeRedirectHandler)
         request = urllib.request.Request(
             asset.url,
             headers={
@@ -64,5 +90,5 @@ class GH():
                 "Accept": "application/octet-stream",
             },
         )
-        with urllib.request.urlopen(request) as response, open(dest, "wb") as out:
+        with opener.open(request) as response, open(dest, "wb") as out:
             shutil.copyfileobj(response, out)

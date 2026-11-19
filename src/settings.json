@@ -248,7 +248,7 @@
                 },
                 {
                     "name": "move",
-                    "arguments": ["JKSV.nro", "switch/jksv"]
+                    "arguments": ["JKSV.nro", "switch/jksv/JKSV.nro"]
                 }
             ]
         },
