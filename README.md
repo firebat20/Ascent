@@ -9,17 +9,17 @@
 
 ## Features
 
-- Background FTP server for filetransfers
-- Install NSP & XCI files from Harddrive, WiFi or wired through PC, Smartphone, etc
-- Over & Underclocking
-- Update OFW & CFW through homebrew
-- Find new homebrew through the Appstore
-- Savegame management
-- Cheating in games (please don't cheat online)
-- Emulate Amiibo
-- Use all kinds of 3rd party controllers
-- Lan play (like Hamachi for your Switch)
-- Ultrahand overlay to control all those features (press L1+R1+DpadDown)
+- Install NSP & XCI files directly from PC, Storage, or Network via Goldleaf
+- Over & Underclocking with sys-clk
+- Update CFW directly on-device using SwitchBlade
+- Savegame management with JKSV
+- In-game cheat management with EdiZon-SE
+- Emulate Amiibo on-device with Emuiibo
+- Use 3rd party wireless controllers (PlayStation, Xbox, Wii/Wii U) with MissionControl
+- Use 3rd party wired controllers via USB with sys-con
+- LAN play with ldn_mitm
+- Comprehensive on-screen overlay control using Ultrahand-Overlay, EdiZon-Overlay, Status Monitor Overlay, and ovl-sysmodules
+- Safe payload management and rebooting with Hekate
 
 ## How to use
 Follow this guide to hack your Switch: https://switch.hacks.guide

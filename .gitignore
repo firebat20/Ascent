@@ -1,11 +1,17 @@
 # === Ascent build artifacts ===
 src/base/
-src/tmp/
-src/sd/
 src/menv/
+src/sd/
+release_notes.md
+changelog.md
 src/release_notes.md
 src/changelog.md
-src/*.zip
+*.zip
+
+# === Environment / Secrets ===
+.env
+.env.*
+!.env.example
 
 # === Python ===
 __pycache__/
@@ -21,20 +27,18 @@ dist/
 *.egg
 
 # === Virtual environments ===
-.env
-.venv
+.venv/
 env/
 venv/
 
-# === Testing ===
+# === Testing & Quality ===
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
 .coverage
 .coverage.*
 htmlcov/
 *.cover
-
-# === Type checkers ===
-.mypy_cache/
 
 # === IDE / Editor ===
 .idea/
@@ -42,6 +46,12 @@ htmlcov/
 *.swp
 *.swo
 *~
+
+# === Operating System ===
+.DS_Store
+._*
+Thumbs.db
+desktop.ini
 
 # === Antigravity / Gemini ===
 .gemini/

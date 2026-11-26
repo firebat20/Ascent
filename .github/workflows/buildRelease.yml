@@ -58,12 +58,14 @@ jobs:
       - name: Create Ascent Packages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_VERSION: ${{ steps.set-version.outputs.version }}
         run: |
           python ./start.py
 
       - name: Generate Release Notes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_VERSION: ${{ steps.set-version.outputs.version }}
         run: |
           python ./version_tracker.py -o="release_notes.md"
 

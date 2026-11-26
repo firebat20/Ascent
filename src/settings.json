@@ -84,6 +84,12 @@
                     ]
                 },
                 {
+                    "name": "create_dir",
+                    "arguments": [
+                        "atmosphere/config"
+                    ]
+                },
+                {
                     "name": "copy",
                     "arguments": [
                         "atmosphere/config_templates/system_settings.ini",
@@ -120,7 +126,7 @@
                 },
                 {
                     "name": "copy",
-                    "arguments": ["bootloader/hekate_*", "bootloader/update.bin"]
+                    "arguments": ["hekate_*.bin", "bootloader/update.bin"]
                 },
                 {
                     "name": "create_dir",
@@ -128,7 +134,7 @@
                 },
                 {
                     "name": "copy",
-                    "arguments": ["bootloader/hekate_*", "atmosphere/reboot_payload.bin"]
+                    "arguments": ["hekate_*.bin", "atmosphere/reboot_payload.bin"]
                 }
             ]
         },
