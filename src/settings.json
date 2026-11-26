@@ -52,9 +52,9 @@
                 "ovlsysmodules",
                 "ultrahand",
                 "statusmonitoroverlay",
-                "missioncontrol",
-                "ldn_mitm",
-                "downgradefixer"
+		        "missioncontrol",
+                "downgradefixer",
+                "lanywhere_selfhost"
             ]
         }
     ],
@@ -417,6 +417,16 @@
                 {
                     "name": "extract",
                     "arguments": [".*DowngradeFixer.*\\.zip"]
+                }
+            ]
+        },
+        "lanywhere_selfhost": {
+            "repo": "SEc-123/Roomcircuit_lanywhere-selfhost",
+            "regex": ["^switch-online-.*-hats\\.zip$"],
+            "steps": [
+                {
+                    "name": "extract",
+                    "arguments": ["^switch-online-.*-hats\\.zip$"]
                 }
             ]
         }
